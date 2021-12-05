@@ -3,17 +3,7 @@ import tkinter as tk
 from collections import Counter
 from math import ceil
 
-cells = {
-    '(1,0)': {'status': 'active'},
-    '(0,1)': {'status': 'active'},
-    '(1,1)': {'status': 'active'},
-    '(2,1)': {'status': 'active'},
-    '(1,2)': {'status': 'active'},
-    }
 
-sides = 9
-grid = {}
-temp_dict = {}
 
 class GUI:
 
@@ -27,15 +17,21 @@ class GUI:
         self.frame_admin = tk.Frame(self.canvas_manager, bg="Light Blue", bd=5, relief=tk.RIDGE)
         self.frame_admin.grid(column=2, row=1)
         # self.label = tk.Label
-        self.speed_control = tk.Button(self.canvas_manager, bg='black', fg='white', padx=10, pady=5, text="speed")
-        self.speed_control.grid(column=2, row=5)
-        self.draw_grid(0, 0)
+        # self.speed_control = tk.Button(self.canvas_manager, bg='black', fg='white', padx=10, pady=5, text="speed")
+        self.speed_control = tk.Scale(self.canvas_manager, from_=100, to=1, orient="horizontal", label="Speed/ms")
+        self.speed_control.set(100)
+        self.speed_control.grid(column=2, row="1", sticky="N")
+        # speed_calc()
+        self.draw_grid()
 
     # def return_label(self):
     #     return self.label
 
     def draw_grid(self, cl=0, rw=0):
+        global sides
+
         sides = max(min_max['max_column'] - min_max['min_column'], min_max['max_row'] - min_max['min_row'])
+        # sides = 0
         print('draw_grid')
         column = cl
         row = rw
@@ -68,10 +64,13 @@ class GUI:
                 if row == sides:
                     column += 1
                     row = 0
-                self.frame.after(1, self.draw_grid, column, row)
+                self.frame.after(ceil(self.speed_calc()/2), self.draw_grid, column, row)
         else:
             remove_inactive()
             cell_neighbors()
+
+    def speed_calc(self):
+        return self.speed_control.get()
 
     # def update_status(self, cell):
     #     if cell in cells:
@@ -105,7 +104,7 @@ class GUI:
             target = grid[cell[0]]['object']
             target.configure(text=cell[0], bg=cell_color, fg=text_color)
             update_status(cell[0])
-            self.frame.after(20, self.draw_changes, it_dict)
+            self.frame.after(self.speed_calc()*2, self.draw_changes, it_dict)
         if cell == -1:
             remove_inactive()
             cell_neighbors()
@@ -299,6 +298,10 @@ class GUI:
     #         print("grid dictionary is " + str(grid))
     #         self.draw_changes()
 
+# def speed_calc():
+#     return app.speed_control.get()
+
+
 def update_status(cell):
     if cell in cells:
         if cells[cell]['status'] == 'emerging':
@@ -406,6 +409,7 @@ def born_dying(census_dict):
 
 
 def max_min():
+    global sides
     print('max_min')
     max_column = min_max['max_column']
     max_row = min_max['max_row']
@@ -418,6 +422,8 @@ def max_min():
             if (cells[cell]['status'] == 'active' or cells[cell]['status'] == 'emerging') and grid[cell]['column'] + 2 > max(max_column, sides):
                 min_max['max_column'] += 2
                 max_column = min_max['max_column']
+                if max_column > sides:
+                    sides += 2
                 max_min_flag = True
             if (cells[cell]['status'] == 'active' or cells[cell]['status'] == 'emerging') and grid[cell]['column'] - 2 < min(min_column, 0):
                 min_max['min_column'] -= 2
@@ -426,6 +432,8 @@ def max_min():
             if (cells[cell]['status'] == 'active' or cells[cell]['status'] == 'emerging') and grid[cell]['row'] + 2 > max(max_row, sides):
                 min_max['max_row'] += 2
                 max_row = min_max['max_row']
+                if max_row > sides:
+                    sides += 2
                 max_min_flag = True
             if (cells[cell]['status'] == 'active' or cells[cell]['status'] == 'emerging') and grid[cell]['row'] - 2 < min(min_row, 0):
                 min_max['min_row'] -= 2
@@ -455,6 +463,18 @@ def max_min():
     else:
         print("grid dictionary is " + str(grid))
         app.draw_changes()
+
+cells = {
+    '(1,0)': {'status': 'active'},
+    '(0,1)': {'status': 'active'},
+    '(1,1)': {'status': 'active'},
+    '(2,1)': {'status': 'active'},
+    '(1,2)': {'status': 'active'},
+    }
+
+sides = 9
+grid = {}
+temp_dict = {}
 
 min_max = {
     'min_column': 0,
