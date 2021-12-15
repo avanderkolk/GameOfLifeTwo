@@ -833,15 +833,17 @@ class canvas_and_grid:
             self,
             cells
     ):
-        ##        print("line 1, select_with_mouse")
+        print("line 1, select_with_mouse")
         self.reset_cell_color(cells)  ## reset to start with a clean board
 
         cell_side = cvs['dimension'] / cvs['side']  ## figure the pixel width of a cell
+        print("debug")
         dashboard_messages.append("inside select_with_mouse")
         thread1 = threading.Thread(target=self.print_to_dashboard)
         thread1.start()
 
         def callback(event):
+            print("callback in select with mouse")
             ## event.x and event.y get the location on the canvas of the mouse and dividing it by the cell length gets the cell coordinates
             mouse_click = "(" + str(floor(event.x / cell_side) + 1) + "," + str(floor(event.y / cell_side) + 1) + ")"
             if cells[mouse_click][0] != 'active':  ## make sure the cell is not already active
