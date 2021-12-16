@@ -341,9 +341,15 @@ def born_dying(census_dict):
         if cell in cells:
             cell_status = cells[cell]['status']
             if cell_status == 'inactive':
-                inactive_delete[cell] = cell
+                if coming_and_going[cell] != 3:
+                    inactive_delete[cell] = cell
+                else:
+                    cells[cell]['status'] = 'emerging'
             elif cell_status == 'dying':
-                cells[cell]['status'] = 'inactive'
+                if coming_and_going[cell] != 3:
+                    cells[cell]['status'] = 'inactive'
+                else:
+                    cells[cell]['status'] = 'emerging'
             elif cell_status == 'emerging':
                 cells[cell]['status'] = 'active'
             elif cells[cell]['status'] == 'active':
@@ -468,6 +474,7 @@ speed_plus = 100
 
 root = tk.Tk()
 app = GUI(root)
+# root.geometry('800x600')
 root.mainloop()
 
 
